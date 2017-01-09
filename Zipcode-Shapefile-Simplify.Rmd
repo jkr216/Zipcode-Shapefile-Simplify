@@ -1,0 +1,46 @@
+---
+title: "Zipcode Shapefile Simplify"
+output: html_notebook
+---
+
+
+```{r, context = "setup", include = FALSE}
+library(rgdal)
+library(sp)
+library(rmapshaper)
+library(leaflet)
+library(httr) 
+```
+
+```{r}
+
+tmp <- tempfile()
+
+httr::GET("http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_zcta510_500k.zip", write_disk(tmp))
+
+unzip(tmp, exdir = 'cb_2015_us_zcta510_500k')
+
+zipcodes <- readOGR("./cb_2015_us_zcta510_500k", 'cb_2015_us_zcta510_500k', verbose = FALSE)
+```
+
+```{r}
+zipcodes@polygons[[1]]@Polygons[[1]]@coords
+```
+
+```{r}
+zipcodes_simplified <- ms_simplify(zipcodes)
+```
+
+```{r}
+zipcodes_simplified@polygons[[1]]@Polygons[[1]]@coords
+```
+
+```{r}
+head(zipcodes_simplified@data, n = 2)
+```
+
+```{r}
+save(zipcodes_simplified, file = "ZipcodeData.Rdat")
+```
+
+
